@@ -9,7 +9,6 @@ use std::sync::Mutex;
 mod modbus;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-
 use std::future::Future;
 use modbus::server::ModbusServer;
 use tokio::net::TcpListener;
@@ -29,21 +28,40 @@ struct RegisterFan {
 }
 
 
+struct ModbusState {
+    coils: Arc<Mutex<HashMap<u16, bool>>>
+}
+
+
+#[tauri::command]
+fn update_coil(app_handle: AppHandle, switch_id: u16, state: bool) -> Result<bool, String> {
+    println!("Updating coil: {} to {}", switch_id, state);
+    let modbus_state = app_handle.state::<ModbusState>();
+
+    let mut coils = modbus_state.coils.lock().unwrap();
+    coils.insert(switch_id, state);
+    let value = coils.get(&switch_id).unwrap();
+
+    Ok(*value)
+} 
 
 #[tokio::main]
 async fn main() {
-
     let server = ModbusServer::new();
-    //let holding = server.holding_registers.clone();
-    //let input = server.input_registers.clone();
 
     let fan_ids: Vec<u8> = Vec::new();
+
+    let modbus_state = ModbusState {
+        coils: server.coils.clone()
+    };
 
     tauri::Builder::default().setup(|app| {
         setup(app.handle().clone(), fan_ids, server);
         println!("Done!");
         Ok(())
       })
+        .manage(modbus_state)
+        .invoke_handler(tauri::generate_handler![update_coil])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -132,9 +132,9 @@ button {
 
   background-color: #184fb5;
   border-width: 0.25rem;
-  border-radius: 0.25rem;
+  
   padding: 0.5rem;
-  box-shadow: 0 0 0.25rem 0.05rem #2f2f2f;
+  box-shadow: 0 0 0.1rem 0.05rem #2f2f2f;
 }
 
 .fan-info p {
@@ -147,11 +147,67 @@ button {
   justify-content: center;
   align-items: center;
 
-  border-color: #2f2f2f;
+  border-color: #1f0f08;
   border-style: solid;
   border-radius: 0.4rem;
   width: fit-content;
   height: fit-content;
   overflow: hidden;
   background-color: #1b51b6;
+  margin: 0.25rem;
+}
+
+.coil-container {
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  border-color: #1f0f08;
+  border-style: solid;
+  border-radius: 0.4rem;
+  margin: 0.25rem;
+}
+
+.coil-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+
+  background-color: #184fb5;
+  border-width: 0.25rem;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  width: fit-content;
+  box-shadow: 0 0 0.25rem 0.05rem #2f2f2f;
+}
+
+.coil-info p {
+  margin: 0.25rem;
+}
+
+.coil-indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: #fa0303;
+  margin: 0.25rem;
+  display: inline-block;
+}
+
+.coil-state {
+  display: flex;
+}
+
+.coil_active {
+  background-color: #00ff00;
+}
+
+.simulation-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: row;
 }

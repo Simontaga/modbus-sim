@@ -10,6 +10,7 @@ use tokio_modbus::{Exception, Request, Response};
 pub struct ModbusServer {
     pub input_registers: Arc<Mutex<HashMap<u16, u16>>>,
     pub holding_registers: Arc<Mutex<HashMap<u16, u16>>>,
+    pub coils: Arc<Mutex<HashMap<u16, bool>>>,
 }
 
 impl tokio_modbus::server::Service for ModbusServer {
@@ -27,6 +28,12 @@ impl tokio_modbus::server::Service for ModbusServer {
             Request::ReadHoldingRegisters(addr, cnt) => {
                 match register_read(&self.holding_registers.lock().unwrap(), addr, cnt) {
                     Ok(values) => future::ready(Ok(Response::ReadHoldingRegisters(values))),
+                    Err(err) => future::ready(Err(err)),
+                }
+            }
+            Request::ReadCoils(addr, cnt) => {
+                match coil_read(&self.coils.lock().unwrap(), addr, cnt) {
+                    Ok(values) => future::ready(Ok(Response::ReadCoils(Vec::new()))),
                     Err(err) => future::ready(Err(err)),
                 }
             }
@@ -96,20 +103,35 @@ fn register_write(
     Ok(())
 }
 
+fn coil_read(
+    coils: &HashMap<u16, bool>,
+    addr: u16,
+    cnt: u16,
+) -> Result<Vec<bool>, Exception> {
+    let mut response_values: Vec<bool> = vec![false; cnt.into()];
+    for i in 0..cnt {
+        let reg_addr = addr + i;
+        if let Some(r) = coils.get(&reg_addr) {
+            response_values[i as usize] = *r;
+        } else {
+            // TODO: Return a Modbus Exception response `IllegalDataAddress` https://github.com/slowtec/tokio-modbus/issues/165
+            println!("SERVER: Exception::IllegalDataAddress");
+            return Err(Exception::IllegalDataAddress);
+        }
+    }
+
+    Ok(response_values)
+}
+
 impl ModbusServer {
     pub fn new() -> Self {
-        // Insert some test data as register values.
         let mut input_registers = HashMap::new();
-        input_registers.insert(0, 1234);
-        input_registers.insert(1, 5678);
         let mut holding_registers = HashMap::new();
-        holding_registers.insert(0, 10);
-        holding_registers.insert(1, 20);
-        holding_registers.insert(2, 30);
-        holding_registers.insert(3, 40);
+        let mut coils = HashMap::new();
         Self {
             input_registers: Arc::new(Mutex::new(input_registers)),
             holding_registers: Arc::new(Mutex::new(holding_registers)),
+            coils: Arc::new(Mutex::new(coils)),
         }
     }
 }

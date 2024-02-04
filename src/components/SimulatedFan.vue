@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { emit, listen } from '@tauri-apps/api/event'
-import { computed, ref } from 'vue'
-import * as chartConfig from './chartConfig.ts'
+import { ref } from 'vue'
 
 import fan from './fan.svg';
 const props = defineProps(['id']);
@@ -34,17 +33,6 @@ emit('register-fan', {
   id: parseInt(props.id),
 });
 
-// Compute the chart data
-const chartData = computed(() => {
-  return [
-    {
-      name: `Fan ${props.id}`,
-      data: [...dataPoints.value]
-    }
-  ];
-})
-
-
 
 
 </script>
@@ -55,13 +43,6 @@ const chartData = computed(() => {
     <div class="fan-info">
       <p>Holding Register: {{ props.id }}</p>
       <p>Current value: {{ value }}</p>
-    </div>
-
-    <div class="fan-graph">
-      <apexchart
-      :options="chartConfig.options.chartOptions"
-      :series="chartData"
-    ></apexchart>
     </div>
   </div>
 </template>
