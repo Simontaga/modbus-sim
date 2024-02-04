@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { emit, listen } from '@tauri-apps/api/event'
 import { computed, ref } from 'vue'
-import * as chartConfig from './chartConfig.js'
-import VueApexCharts from "vue3-apexcharts";
+import * as chartConfig from './chartConfig.ts'
 
 import fan from './fan.svg';
 const props = defineProps(['id']);
 const value = ref(0);
-const dataPoints = ref([]);
 
-listen(`fan-val-${props.id}`, (event) => {
+
+type DataPoint = {
+  x: number;
+  y: number;
+}
+
+const dataPoints = ref<Array<DataPoint>>([]);
+
+listen<string>(`fan-val-${props.id}`, (event) => {
   let new_value = parseInt(event.payload);
   value.value = new_value;
 
