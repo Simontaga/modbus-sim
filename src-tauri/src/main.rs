@@ -35,9 +35,8 @@ struct ModbusState {
 
 #[tauri::command]
 fn update_coil(app_handle: AppHandle, switch_id: u16, state: bool) -> Result<bool, String> {
-    println!("Updating coil: {} to {}", switch_id, state);
+    // TODO: Handle errors.
     let modbus_state = app_handle.state::<ModbusState>();
-
     let mut coils = modbus_state.coils.lock().unwrap();
     coils.insert(switch_id, state);
     let value = coils.get(&switch_id).unwrap();
@@ -68,6 +67,9 @@ async fn main() {
 
 
 fn setup(app_handle: AppHandle, fan_ids: Vec<u8>, server: ModbusServer) {
+    /* 
+        TODO: Grab state from the app handle instead.
+     */
     let fan_ids_shared = Arc::new(Mutex::new(fan_ids));
 
     let evt_clone = fan_ids_shared.clone();

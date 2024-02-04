@@ -5,12 +5,15 @@ import Coil from "./components/Coil.vue";
 
 <template>
   <div class="container">
-    <SimulatedFan id="1" />
-    <SimulatedFan id="2" />
+    <div class="simulation-container">
+      <div v-for="x in 3">
+        <SimulatedFan :id="x-1" />
+      </div>
+    </div>
 
     <div class="simulation-container">
       <div v-for="x in 10">
-        <Coil :id="x" />
+        <Coil :id="x-1" />
       </div>
     </div>
     

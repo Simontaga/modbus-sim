@@ -33,7 +33,7 @@ impl tokio_modbus::server::Service for ModbusServer {
             }
             Request::ReadCoils(addr, cnt) => {
                 match coil_read(&self.coils.lock().unwrap(), addr, cnt) {
-                    Ok(values) => future::ready(Ok(Response::ReadCoils(Vec::new()))),
+                    Ok(values) => future::ready(Ok(Response::ReadCoils(values))),
                     Err(err) => future::ready(Err(err)),
                 }
             }
@@ -128,6 +128,22 @@ impl ModbusServer {
         let mut input_registers = HashMap::new();
         let mut holding_registers = HashMap::new();
         let mut coils = HashMap::new();
+
+        // Initialize coils
+        for i in 0..1000 {
+            coils.insert(i, false);
+        }
+
+        // Initialize holding registers
+        for i in 0..1000 {
+            holding_registers.insert(i, 0);
+        }
+
+        // Initialize input registers
+        for i in 0..1000 {
+            input_registers.insert(i, 0);
+        }
+
         Self {
             input_registers: Arc::new(Mutex::new(input_registers)),
             holding_registers: Arc::new(Mutex::new(holding_registers)),
